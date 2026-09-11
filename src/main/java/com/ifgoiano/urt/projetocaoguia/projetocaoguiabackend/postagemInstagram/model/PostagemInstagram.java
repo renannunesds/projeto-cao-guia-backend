@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostagemInstagram{
-    
+public class PostagemInstagram {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
