@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 
@@ -113,8 +115,12 @@ public class NoticiaService {
             StatusNoticia status, String tags,
             LocalDateTime dataInicio, LocalDateTime dataFim,
             Pageable pageable) {
+        Pageable paginacaoSegura = (pageable == null || pageable.getPageSize() < 6)
+                ? PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "publicadoEm"))
+                : pageable;
+
         return repository
-                .buscarComFiltros(titulo, autor, categoria, status, tags, dataInicio, dataFim, pageable)
+                .buscarComFiltros(titulo, autor, categoria, status, tags, dataInicio, dataFim, paginacaoSegura)
                 .map(NoticiaResponseDTO::from);
     }
 

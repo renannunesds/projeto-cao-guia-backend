@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class NoticiaRequestDTO {
 
@@ -26,5 +28,12 @@ public class NoticiaRequestDTO {
     private String tags;
 
     private String imagemUrl;
-}
 
+    private String fonteOrigem;
+
+    private String linkOrigem;
+
+    private LocalDateTime publicadoEm;
+
+    private String audiodescricaoIA;
+}

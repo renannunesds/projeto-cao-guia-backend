@@ -1,6 +1,5 @@
 package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.noticias.model;
 
-import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.usuarios.model.UsuarioSimplificadoDTO;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -8,7 +7,6 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class NoticiaResponseDTO {
-
     private Long id;
     private String titulo;
     private String conteudo;
@@ -18,29 +16,28 @@ public class NoticiaResponseDTO {
     private StatusNoticia status;
     private String tags;
     private String imagemUrl;
-    private UsuarioSimplificadoDTO criadoPor;
-    private UsuarioSimplificadoDTO atualizadoPor;
+    private String linkOrigem;
+    private String fonteOrigem;
+    private String audiodescricaoIA;
     private LocalDateTime criadoEm;
-    private LocalDateTime atualizadoEm;
     private LocalDateTime publicadoEm;
 
-    public static NoticiaResponseDTO from(Noticia n) {
+    public static NoticiaResponseDTO from(Noticia noticia) {
         return NoticiaResponseDTO.builder()
-                .id(n.getId())
-                .titulo(n.getTitulo())
-                .conteudo(n.getConteudo())
-                .resumo(n.getResumo())
-                .autor(n.getAutor())
-                .categoria(n.getCategoria())
-                .status(n.getStatus())
-                .tags(n.getTags())
-                .imagemUrl(n.getImagemUrl())
-                .criadoPor(UsuarioSimplificadoDTO.from(n.getCriadoPor()))
-                .atualizadoPor(UsuarioSimplificadoDTO.from(n.getAtualizadoPor()))
-                .criadoEm(n.getCriadoEm())
-                .atualizadoEm(n.getAtualizadoEm())
-                .publicadoEm(n.getPublicadoEm())
+                .id(noticia.getId())
+                .titulo(noticia.getTitulo())
+                .conteudo(noticia.getConteudo())
+                .resumo(noticia.getResumo())
+                .autor(noticia.getAutor())
+                .categoria(noticia.getCategoria())
+                .status(noticia.getStatus())
+                .tags(noticia.getTags())
+                .imagemUrl(noticia.getImagemUrl())
+                .linkOrigem(noticia.getLinkOrigem())
+                .fonteOrigem(noticia.getFonteOrigem())
+                .audiodescricaoIA(noticia.getAudiodescricaoIA())
+                .criadoEm(noticia.getCriadoEm())
+                .publicadoEm(noticia.getPublicadoEm())
                 .build();
     }
 }
-

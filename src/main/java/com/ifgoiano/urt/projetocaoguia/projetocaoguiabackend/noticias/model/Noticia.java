@@ -40,7 +40,17 @@ public class Noticia {
 
     private String tags;
 
+    @Column(length = 1000)
     private String imagemUrl;
+
+    @Column(unique = true, length = 500)
+    private String linkOrigem;
+
+    @Column(length = 50)
+    private String fonteOrigem; // "INSTAGRAM" ou "IF_GOIANO"
+
+    @Column(columnDefinition = "TEXT")
+    private String audiodescricaoIA;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "criado_por_id", nullable = false)
@@ -70,4 +80,3 @@ public class Noticia {
         if (status == StatusNoticia.PUBLICADO && publicadoEm == null) publicadoEm = LocalDateTime.now();
     }
 }
-

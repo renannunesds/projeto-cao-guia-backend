@@ -2,6 +2,7 @@ package com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.noticias.controlle
 
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.noticias.model.*;
 import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.noticias.service.NoticiaService;
+import com.ifgoiano.urt.projetocaoguia.projetocaoguiabackend.noticias.service.SincronizacaoNoticiasService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/noticias")
+@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @Tag(
         name = "Notícias",
@@ -32,14 +33,22 @@ import java.time.LocalDateTime;
 public class NoticiaController {
 
     private final NoticiaService service;
+    private final SincronizacaoNoticiasService sincronizacaoService;
 
-    @PostMapping
-    @Operation(summary = "Cadastrar notícia")
+    @PostMapping("/sincronizar")
+    @Operation(summary = "Sincroniza notícia vinda do scraper (Instagram ou IF Goiano) com deduplicação, data real e IA")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<NoticiaResponseDTO> criar(
-            @Valid @RequestBody NoticiaRequestDTO dto) {
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.criar(dto));
+    public ResponseEntity<NoticiaResponseDTO> sincronizarNoticia(@RequestBody NoticiaRequestDTO dto) {
+        Noticia salva = sincronizacaoService.sincronizarItem(
+                dto.getFonteOrigem() != null ? dto.getFonteOrigem() : "INSTAGRAM",
+                dto.getLinkOrigem(),
+                dto.getTitulo(),
+                dto.getConteudo(),
+                dto.getImagemUrl(),
+                dto.getPublicadoEm(),
+                dto.getAudiodescricaoIA()
+        );
+        return ResponseEntity.ok(NoticiaResponseDTO.from(salva));
     }
 
     @GetMapping("/{id}")
@@ -111,8 +120,16 @@ public class NoticiaController {
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataFim,
 
-            @PageableDefault(size = 10, sort = "criadoEm", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "publicadoEm", direction = Sort.Direction.DESC) Pageable pageable) {
 
         return ResponseEntity.ok(service.listar(titulo, autor, categoria, status, tags, dataInicio, dataFim, pageable));
+    }
+
+    @PostMapping("/sincronizar-ifgoiano")
+    @Operation(summary = "Força a varredura imediata no portal do IF Goiano")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> sincronizarIfGoianoAgora() {
+        sincronizacaoService.varrerPortalIfGoiano();
+        return ResponseEntity.ok().build();
     }
 }

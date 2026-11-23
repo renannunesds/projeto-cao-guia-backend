@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,10 +35,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Libera preflight CORS do navegador
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Autenticação pública
                         .requestMatchers("/api/usuarios/cadastro", "/api/usuarios/login").permitAll()
                         // Ferramentas de dev
@@ -46,13 +50,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/noticias/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/depoimentos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/treinamentos/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/instagram/**").permitAll() // Liberado para o site ler as postagens
+                        .requestMatchers(HttpMethod.GET, "/api/instagram/**").permitAll()
                         // Envio de formulário é público
                         .requestMatchers(HttpMethod.POST, "/api/formularios").permitAll()
-                        // Todo o resto exige autenticação (o /sincronizar via POST continuará protegido para ADMIN)
+                        // Todo o resto exige autenticação
                         .anyRequest().authenticated()
                 )
-                // Permite frames (necessário para interfaces embarcadas)
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
