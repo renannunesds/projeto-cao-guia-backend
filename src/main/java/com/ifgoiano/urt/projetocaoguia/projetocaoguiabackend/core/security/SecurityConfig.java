@@ -51,8 +51,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/depoimentos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/treinamentos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/instagram/**").permitAll()
-                        // Envio de formulário é público
-                        .requestMatchers(HttpMethod.POST, "/api/formularios").permitAll()
                         // Todo o resto exige autenticação
                         .anyRequest().authenticated()
                 )
